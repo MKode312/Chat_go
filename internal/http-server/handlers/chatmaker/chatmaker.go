@@ -19,7 +19,7 @@ import (
 
 type Request struct {
 	Name         string `json:"Name" validate:"required"`
-	Participants string `json:"Participants(usernames)" validate:"required"`
+	Participants string `json:"Participants" validate:"required"`
 }
 
 type ResponseMessages struct {
@@ -62,14 +62,14 @@ func NewChatmakerHandler(log *slog.Logger, ChatInteractor ChatInteractor) http.H
 			return
 		}
 
-		log.Info("request bosy decoded", slog.Any("request", req))
-
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
 			log.Error("invalid request", sl.Err(err))
 			http.Error(w, val.ValidationError(validateErr), http.StatusBadRequest)
 			return
 		}
+
+		log.Info("request bosy decoded", slog.Any("request", req))
 
 		users := strings.ReplaceAll(req.Participants, " ", "")
 		listOfUsers := strings.Split(users, ",")
